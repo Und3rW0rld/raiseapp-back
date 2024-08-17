@@ -11,15 +11,25 @@ import com.ashen.raiseback.service.EntrepreneurService;
 import com.ashen.raiseback.service.InvestorService;
 import com.ashen.raiseback.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/api/v1")
 public class UserController {
 
+    @Value("${server.port}")
+    private String port;
     private final UserService userService;
     private final EntrepreneurService entrepreneurService;
     private final InvestorService investorService;
@@ -110,6 +120,102 @@ public class UserController {
             return new ResponseEntity<>("Error deleting user.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PutMapping("/users/edit/{id}")
+    public ResponseEntity<?> updateUser (@PathVariable(name = "id") long id,
+                                         @RequestBody UserDTO userDTO){
+        Optional<User> userOptional = userService.getUserById(id);
+        User userData = UserMapper.toEntity(userDTO);
+
+        if (userOptional.isEmpty()){
+            return new ResponseEntity<>("User with the given id was not found", HttpStatus.BAD_REQUEST);
+        }
+
+        User user = userOptional.get();
+
+        if ( !userData.getName().isEmpty() && userData.getName() != null ){
+            user.setName(userData.getName());
+        }
+
+        if ( !userData.getEmail().isEmpty() && userData.getEmail() != null ){
+            user.setEmail(userData.getEmail());
+        }
+
+        if ( !userData.getPassword().isEmpty() && userData.getPassword() != null ){
+            user.setPassword(userData.getPassword());
+        }
+
+        if ( userData.getPublicKey() != null && !userData.getPublicKey().isEmpty() ){
+            user.setPublicKey(userData.getPublicKey());
+        }
+
+        userService.createUser(user);
+
+        return new ResponseEntity<>("User updated successfully", HttpStatus.OK);
+
+    }
+
+
+    @PostMapping("/upload/profile-image/{id}")
+    public ResponseEntity<?> uploadProfileImage(
+            @PathVariable(name="id") long id,
+            @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Por favor sube un archivo válido.");
+        }
+
+        try {
+            Optional<User> userOptional = userService.getUserById(id);
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+
+                // Obtener la ruta de la imagen anterior
+                String oldImageUrl = user.getImage();
+                if (oldImageUrl != null && !oldImageUrl.isEmpty()) {
+                    // Convertir la URL de la imagen en un Path del sistema de archivos
+                    Path oldImagePath = Paths.get("uploads/" + oldImageUrl.substring(oldImageUrl.lastIndexOf('/') + 1));
+                    try {
+                        // Eliminar la imagen anterior
+                        Files.deleteIfExists(oldImagePath);
+                    } catch (IOException e) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar la imagen anterior.");
+                    }
+                }
+
+                // Guarda el nuevo archivo en el sistema de archivos local
+                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                Path path = Paths.get("uploads/" + fileName);
+                Files.createDirectories(path.getParent());
+                Files.write(path, file.getBytes());
+
+                // Actualizar la URL o ruta del archivo guardado
+                String fileUrl = "http://localhost:" + port + "/api/v1/uploads/" + fileName;
+                user.setImage(fileUrl);
+                userService.createUser(user);
+
+                return ResponseEntity.ok().body(fileUrl);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado.");
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al subir el archivo.");
+        }
+    }
+
+
+    @GetMapping("/img_path/{id}")
+    public ResponseEntity<?> getProfileImagen(
+            @PathVariable(name="id") long id
+    ){
+        Optional <User> userOpt = userService.getUserById(id);
+        String profileImg = null;
+        if (userOpt.isPresent()){
+            User user = userOpt.get();
+            profileImg = user.getImage();
+        }
+        return ResponseEntity.ok().body(profileImg);
+    }
+
 
 
 }

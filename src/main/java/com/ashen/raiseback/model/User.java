@@ -25,24 +25,29 @@ public class User {
     @Column(name = "PUBLIC_KEY", unique = true)
     private String publicKey;
 
-    public User() {
-    }
+    @Column(name = "USER_IMAGE")
+    private String image;
 
-    public User(long id, String name, String password, String email, UserType type, String publicKey) {
+    public User(long id, String name, String password, String email, UserType type, String publicKey, String image) {
         this.id = id;
         this.name = name;
         this.password = password;
         this.email = email;
         this.type = type;
         this.publicKey = publicKey;
+        this.image = image;
     }
 
-    public User(String name, String password, String email, UserType type, String publicKey) {
+    public User(String name, String password, String email, UserType type, String publicKey, String image) {
         this.name = name;
         this.password = password;
         this.email = email;
         this.type = type;
         this.publicKey = publicKey;
+        this.image = image;
+    }
+
+    public User() {
     }
 
     public long getId() {
@@ -93,6 +98,14 @@ public class User {
         this.publicKey = publicKey;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -102,6 +115,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", type=" + type +
                 ", publicKey='" + publicKey + '\'' +
+                ", image='" + image + '\'' +
                 '}';
     }
 }

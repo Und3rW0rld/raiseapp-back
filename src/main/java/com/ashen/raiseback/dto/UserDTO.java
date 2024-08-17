@@ -7,29 +7,30 @@ public class UserDTO {
     private String type;
     private String publicKey;
     private String password;  // Incluye el campo password
+    private String image;
 
-    // Constructores
-    public UserDTO() {
-    }
-
-    public UserDTO(long id, String name, String email, String type, String publicKey, String password) {
+    public UserDTO(long id, String name, String email, String type, String publicKey, String password, String image) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.type = type;
         this.publicKey = publicKey;
         this.password = password;
+        this.image = image;
     }
 
-    public UserDTO(String name, String email, String type, String publicKey, String password) {
+    public UserDTO(String name, String email, String type, String publicKey, String password, String image) {
         this.name = name;
         this.email = email;
         this.type = type;
         this.publicKey = publicKey;
         this.password = password;
+        this.image = image;
     }
 
-    // Getters y Setters
+    public UserDTO() {
+    }
+
     public long getId() {
         return id;
     }
@@ -78,6 +79,14 @@ public class UserDTO {
         this.password = password;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @Override
     public String toString() {
         return "UserDTO{" +
@@ -87,6 +96,7 @@ public class UserDTO {
                 ", type='" + type + '\'' +
                 ", publicKey='" + publicKey + '\'' +
                 ", password='" + password + '\'' +
+                ", image='" + image + '\'' +
                 '}';
     }
 }

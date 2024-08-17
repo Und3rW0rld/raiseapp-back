@@ -12,7 +12,8 @@ public class UserMapper {
                 user.getEmail(),
                 user.getType().name(),  // Asumiendo que UserType es un enum
                 user.getPublicKey(),
-                user.getPassword()      // Incluye la contraseña
+                user.getPassword(),
+                user.getImage()
         );
     }
 
@@ -24,6 +25,7 @@ public class UserMapper {
         user.setType(UserType.valueOf(userDTO.getType().toUpperCase()));  // Asumiendo que UserType es un enum
         user.setPublicKey(userDTO.getPublicKey());
         user.setPassword(userDTO.getPassword());  // Incluye la contraseña
+        user.setImage(userDTO.getImage());
         return user;
     }
 }
