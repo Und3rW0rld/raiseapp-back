@@ -31,4 +31,7 @@ public class EntrepreneurService {
         return false;
     }
 
+    public Optional<Entrepreneur> getEntrepreneurByUserId( long id ){
+        return this.entrepreneurRepository.findByUser_Id( id );
+    }
 }
