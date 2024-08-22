@@ -1,10 +1,17 @@
 package com.ashen.raiseback.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@Setter
+@ToString
 @Entity
 public class Entrepreneur {
 
@@ -16,6 +23,7 @@ public class Entrepreneur {
     @JoinColumn(name = "USUARIO_ID", referencedColumnName = "ID")
     private User user;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "entrepreneur", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Business> businesses = new ArrayList<>();
 
@@ -30,30 +38,5 @@ public class Entrepreneur {
 
     public Entrepreneur(User user) {
         this.user = user;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Entrepreneur{" +
-                "id=" + id +
-                ", user=" + user +
-                '}';
     }
 }
